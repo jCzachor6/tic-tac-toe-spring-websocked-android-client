@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".fragments.ConnectFragment"
+    android:layout_marginTop="200dp">
+
+    <TextView
+        android:id="@+id/enter_name_tv"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="@string/enter_name" />
+
+    <EditText
+        android:id="@+id/enter_name_et"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:maxLength="10"
+        android:inputType="textPersonName"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/enter_name_button"
+        android:layout_marginTop="50dp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="@string/connect" />
+</LinearLayout>

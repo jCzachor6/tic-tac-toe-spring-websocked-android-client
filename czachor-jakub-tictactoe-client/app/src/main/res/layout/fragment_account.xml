@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".fragments.AccountFragment">
+
+    <TextView
+        android:id="@+id/account_player_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="45sp" />
+
+    <TextView
+        android:id="@+id/account_player_wins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wins: "
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/account_player_games"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Games: "
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/account_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/refresh" />
+
+    <Button
+        android:id="@+id/account_disconnect"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="@string/disconnect" />
+
+
+</LinearLayout>

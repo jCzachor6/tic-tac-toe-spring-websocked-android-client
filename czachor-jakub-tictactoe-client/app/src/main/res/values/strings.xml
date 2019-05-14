@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">tictactoeclient</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_name">Enter name: </string>
+    <string name="name">Name</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="refresh">Refresh</string>
+    <string name="vs">vs.</string>
+    <string name="room_full">Room is full.</string>
+    <string name="msg_empty_room">Room is empty.</string>
+    <string name="msg_waiting_for_player_two">Waiting for player two.</string>
+    <string name="msg_waiting_for_player_one">Waiting for player one.</string>
+    <string name="msg_player_one_turn">Player one turn.</string>
+    <string name="msg_player_two_turn">Player two turn.</string>
+    <string name="msg_player_one_won">Player one won!</string>
+    <string name="msg_player_two_won">Player two won!</string>
+    <string name="msg_player_one_rematch">Player one wants a rematch.</string>
+    <string name="msg_player_two_rematch">Player two wants a rematch.</string>
+</resources>

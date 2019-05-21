@@ -145,6 +145,8 @@ public class GameFragment extends Fragment {
                 break;
             case PLAYER_TWO_REMATCH:
                 this.roomMessage.setText(R.string.msg_player_two_rematch);
+            case DRAW:
+                this.roomMessage.setText(R.string.draw);
                 break;
         }
     }

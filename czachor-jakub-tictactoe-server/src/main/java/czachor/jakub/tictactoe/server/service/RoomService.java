@@ -104,6 +104,7 @@ public class RoomService {
                         room.getPlayerOne().addWin();
                     }
                     break;
+                case DRAW:
                 case PLAYER_ONE_WON:
                 case PLAYER_TWO_WON:
                 case PLAYER_ONE_REMATCH:
@@ -140,6 +141,9 @@ public class RoomService {
                 room.setState(RoomState.PLAYER_TWO_WON);
             }
         }
+        if(checkDraw(room.getTiles())){
+            room.setState(RoomState.DRAW);
+        }
         return room;
     }
 
@@ -161,5 +165,7 @@ public class RoomService {
         return tiles.get(tile1).equals(state) && tiles.get(tile2).equals(state) && tiles.get(tile3).equals(state);
     }
 
-
+    private Boolean checkDraw(List<String> tiles){
+        return tiles.stream().noneMatch(tile -> tile.equals("n"));
+    }
 }

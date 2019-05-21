@@ -8,10 +8,7 @@ import czachor.jakub.tictactoe.server.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoomService {
@@ -34,6 +31,7 @@ public class RoomService {
         Room room = this.roomRepository.getById(roomId).get();
         if (!RoomState.isFull(room.getState())) {
             this.leaveRoom(player.getName());
+            player.setTimeoutCheck(new Date());
             switch (room.getState()) {
                 case EMPTY:
                     room.setPlayerOne(player);

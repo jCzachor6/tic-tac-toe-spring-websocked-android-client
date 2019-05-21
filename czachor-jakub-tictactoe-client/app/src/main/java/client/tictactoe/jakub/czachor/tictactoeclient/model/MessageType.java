@@ -7,5 +7,6 @@ public enum MessageType {
     ACTION,
     REMATCH,
     LEAVE,
-    REFRESH
+    REFRESH,
+    TIMEOUT_CHECK
 }

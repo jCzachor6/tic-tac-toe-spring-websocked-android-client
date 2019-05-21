@@ -2,12 +2,15 @@ package czachor.jakub.tictactoe.server.models;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class Player {
     private String name;
     private Long games;
     private Long wins;
     private Boolean rematch;
+    private Date timeoutCheck;
 
     public Player(String name) {
         this.name = name;

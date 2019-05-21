@@ -93,6 +93,13 @@ public class GameMessage {
         return message;
     }
 
+    public static GameMessage getTimeoutCheckMessage(String playerName) {
+        GameMessage message = new GameMessage();
+        message.playerName = playerName;
+        message.setType(MessageType.TIMEOUT_CHECK);
+        return message;
+    }
+
     public String json() {
         return new Gson().toJson(this);
     }

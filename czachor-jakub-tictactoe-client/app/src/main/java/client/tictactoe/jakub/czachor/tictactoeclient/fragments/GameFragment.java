@@ -3,6 +3,8 @@ package client.tictactoe.jakub.czachor.tictactoeclient.fragments;
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,11 +26,13 @@ import java.util.Objects;
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
 import client.tictactoe.jakub.czachor.tictactoeclient.TicTacToeApplication;
 import client.tictactoe.jakub.czachor.tictactoeclient.model.GameMessage;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.Player;
 import client.tictactoe.jakub.czachor.tictactoeclient.model.Room;
 import client.tictactoe.jakub.czachor.tictactoeclient.utils.StringUtils;
 
 public class GameFragment extends Fragment {
+    private Handler handler;
+    private Runnable timeoutCheck;
+
     private Room currentRoom;
     private String playerName;
 
@@ -59,6 +63,24 @@ public class GameFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.loadArgs();
         this.subscribeRoom();
+        this.initTimeoutCheck();
+    }
+
+    private void initTimeoutCheck() {
+        handler = new Handler();
+        timeoutCheck = () -> {
+            GameMessage msg = GameMessage.getTimeoutCheckMessage(this.playerName);
+            TicTacToeApplication
+                    .instance()
+                    .getStompClient()
+                    .send("/topic/tictactoe", msg.json()).subscribe();
+            if (timeoutCheck != null) {
+                Message m = Message.obtain(handler, timeoutCheck);
+                handler.sendMessageDelayed(m, 4000);
+            }
+        };
+        Message m = Message.obtain(handler, timeoutCheck);
+        handler.sendMessageDelayed(m, 1);
     }
 
     @Override
@@ -171,6 +193,7 @@ public class GameFragment extends Fragment {
     }
 
     private View.OnClickListener onLeaveButtonClick = v -> {
+        handler.removeCallbacks(timeoutCheck);
         TicTacToeApplication.instance().getSubscriptions().remove("/tictactoe/" + this.currentRoom.getId());
         GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName);
         TicTacToeApplication
@@ -197,14 +220,14 @@ public class GameFragment extends Fragment {
                 .instance()
                 .getSubscriptions()
                 .addSubscription("/tictactoe/" + this.currentRoom.getId(), topicMessage -> {
-            this.currentRoom = new Gson().fromJson(topicMessage.getPayload(), Room.class);
-            Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                this.refreshTiles();
-                this.refreshTextViews();
-                this.refreshRoomMessage();
-            });
-            System.out.println(topicMessage.getPayload());
-        });
+                    this.currentRoom = new Gson().fromJson(topicMessage.getPayload(), Room.class);
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        this.refreshTiles();
+                        this.refreshTextViews();
+                        this.refreshRoomMessage();
+                    });
+                    System.out.println(topicMessage.getPayload());
+                });
     }
 
     private void refreshTiles() {
@@ -228,6 +251,7 @@ public class GameFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        handler.removeCallbacks(timeoutCheck);
         GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName);
         TicTacToeApplication
                 .instance()

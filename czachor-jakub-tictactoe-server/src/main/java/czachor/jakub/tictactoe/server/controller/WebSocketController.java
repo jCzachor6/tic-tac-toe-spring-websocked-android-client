@@ -3,12 +3,13 @@ package czachor.jakub.tictactoe.server.controller;
 import czachor.jakub.tictactoe.server.message.GameMessage;
 import czachor.jakub.tictactoe.server.models.Player;
 import czachor.jakub.tictactoe.server.models.Room;
-import czachor.jakub.tictactoe.server.models.RoomState;
 import czachor.jakub.tictactoe.server.models.dto.PlayerDto;
 import czachor.jakub.tictactoe.server.models.dto.RoomDto;
 import czachor.jakub.tictactoe.server.service.PlayerService;
 import czachor.jakub.tictactoe.server.service.RoomService;
 import czachor.jakub.tictactoe.server.util.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -20,6 +21,8 @@ import java.util.List;
 
 @Controller
 public class WebSocketController {
+    private static Logger logger = LoggerFactory.getLogger(WebSocketController.class);
+
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final RoomService roomService;
     private final PlayerService playerService;
@@ -33,7 +36,7 @@ public class WebSocketController {
 
     @MessageMapping("/tictactoe")
     private void game(GameMessage message) {
-        System.out.println("Received message: " + message);
+        logger.info("Received message: {}", message);
         switch (message.getType()) {
             case TIMEOUT_CHECK:
                 this.playerService.refreshTimeoutCheck(message.getPlayerName());
@@ -72,27 +75,39 @@ public class WebSocketController {
 
     @Scheduled(fixedRate = 10000)
     public void dropOnTimeout() {
+        logger.info("Timeout check. ");
         Date current = new Date();
-        Boolean isAnyoneDropped = false;
+        int droppedCount = 0;
+        int activePlayers = 0;
         for (Room room : roomService.getAll()) {
             if (room.getPlayerOne() != null) {
+                activePlayers++;
                 long ms = (current.getTime() - room.getPlayerOne().getTimeoutCheck().getTime());
                 if (ms > 10000) {
                     this.roomService.leaveRoom(room.getPlayerOne().getName());
-                    isAnyoneDropped = true;
+                    droppedCount++;
                 }
             }
             if (room.getPlayerTwo() != null) {
+                activePlayers++;
                 long ms = (room.getPlayerTwo().getTimeoutCheck().getSeconds() - current.getSeconds());
                 if (ms > 10) {
                     this.roomService.leaveRoom(room.getPlayerTwo().getName());
-                    isAnyoneDropped = true;
+                    droppedCount++;
                 }
             }
         }
-        if (isAnyoneDropped) {
+        if (isAnyoneDropped(droppedCount)) {
+            logger.debug("Removing {} afk players from rooms. ", droppedCount);
             this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
+        } else {
+            logger.debug("Could not find afk players. ");
         }
+        logger.debug("Total active players: " + activePlayers);
+    }
+
+    private boolean isAnyoneDropped(int droppedCount) {
+        return droppedCount > 0;
     }
 
     private List<RoomDto> roomsLookup() {

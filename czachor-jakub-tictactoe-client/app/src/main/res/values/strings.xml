@@ -19,4 +19,8 @@
     <string name="msg_player_one_rematch">Player one wants a rematch.</string>
     <string name="msg_player_two_rematch">Player two wants a rematch.</string>
     <string name="draw">Draw.</string>
+    <string name="empty_player_name">-</string>
+    <string name="wins">Wins:</string>
+    <string name="games">Games:</string>
+    <string name="refresh_profile">Refresh profile</string>
 </resources>

@@ -1,18 +1,15 @@
 package client.tictactoe.jakub.czachor.tictactoeclient.fragments;
 
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
-import client.tictactoe.jakub.czachor.tictactoeclient.TicTacToeApplication;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.GameMessage;
 import client.tictactoe.jakub.czachor.tictactoeclient.utils.ViewPagerAdapter;
 
 public class AppMainFragment extends Fragment {

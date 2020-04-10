@@ -4,10 +4,9 @@ package client.tictactoe.jakub.czachor.tictactoeclient.fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import com.google.gson.Gson;
 
 import java.util.Objects;
 
-import client.tictactoe.jakub.czachor.tictactoeclient.MainActivity;
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
 import client.tictactoe.jakub.czachor.tictactoeclient.TicTacToeApplication;
 import client.tictactoe.jakub.czachor.tictactoeclient.model.GameMessage;

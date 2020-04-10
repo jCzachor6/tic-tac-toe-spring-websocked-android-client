@@ -24,4 +24,10 @@
     <string name="games">Games:</string>
     <string name="refresh_profile">Refresh profile</string>
     <string name="your_username">Your username.</string>
+    <string name="pvp">- vs -</string>
+    <string name="score">- : -</string>
+    <string name="tile">Tile</string>
+    <string name="leave_game">Leave game</string>
+    <string name="rematch">Rematch</string>
+    <string name="message">Message</string>
 </resources>

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -27,7 +28,7 @@ public class AccountFragment extends Fragment {
     private TextView tvPlayerName;
     private TextView tvPlayerWins;
     private TextView tvPlayerGames;
-    private Button refreshButton;
+    private ImageButton refreshButton;
     private Button disconnectButton;
     private String playerName;
 
@@ -93,7 +94,7 @@ public class AccountFragment extends Fragment {
         startActivity(mIntent);
     }
 
-    void loadArgs() {
+    private void loadArgs() {
         Bundle args = getArguments();
         if (args != null) {
             this.playerName = args.getString("playerName");

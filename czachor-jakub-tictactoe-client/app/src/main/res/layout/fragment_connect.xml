@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical"
-    tools:context=".fragments.ConnectFragment"
-    android:layout_marginTop="200dp">
+    tools:context=".fragments.ConnectFragment">
 
-    <TextView
-        android:id="@+id/enter_name_tv"
-        android:layout_width="100dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:text="@string/enter_name" />
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/enter_name_et"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:maxLength="10"
-        android:inputType="textPersonName"
-        android:textAlignment="center" />
+        <TextView
+            android:id="@+id/enter_name_tv"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/enter_name"
+            android:textAlignment="center" />
 
-    <Button
-        android:id="@+id/enter_name_button"
-        android:layout_marginTop="50dp"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="@string/connect" />
-</LinearLayout>
+        <EditText
+            android:id="@+id/enter_name_et"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:maxLength="10"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:hint="@string/your_username"
+            android:importantForAutofill="no" />
+
+        <Button
+            android:id="@+id/enter_name_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:drawableEnd="@android:drawable/ic_menu_send"
+            android:text="@string/connect" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

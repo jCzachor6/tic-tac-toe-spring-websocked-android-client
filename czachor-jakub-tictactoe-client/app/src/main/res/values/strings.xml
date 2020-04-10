@@ -23,4 +23,5 @@
     <string name="wins">Wins:</string>
     <string name="games">Games:</string>
     <string name="refresh_profile">Refresh profile</string>
+    <string name="your_username">Your username.</string>
 </resources>

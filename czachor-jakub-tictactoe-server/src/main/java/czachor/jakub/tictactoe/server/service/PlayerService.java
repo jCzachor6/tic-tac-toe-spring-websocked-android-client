@@ -23,14 +23,11 @@ public class PlayerService {
 
     public Player getPlayerByName(String playerName) {
         Optional<Player> player = this.playerRepository.getByName(playerName);
-        return player.orElseGet(() -> {
-            logger.info("Adding new player with username: {}", playerName);
+        if (player.isPresent()) {
+            player.get().setTimeoutCheck(new Date());
+            return player.get();
+        } else {
             return this.playerRepository.addPlayer(playerName);
-        });
-    }
-
-    public void refreshTimeoutCheck(String playerName) {
-        Optional<Player> player = this.playerRepository.getByName(playerName);
-        player.ifPresent(player1 -> player1.setTimeoutCheck(new Date()));
+        }
     }
 }

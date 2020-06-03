@@ -11,14 +11,4 @@ public enum RoomState {
     PLAYER_ONE_REMATCH,
     PLAYER_TWO_REMATCH,
     DRAW;
-
-    public static Boolean isFull(RoomState state){
-        return !(state.equals(RoomState.EMPTY) || state.equals(RoomState.PLAYER_ONE) || state.equals(RoomState.PLAYER_TWO));
-    }
-
-    public static Boolean isFinished(RoomState state){
-        return state.equals(RoomState.PLAYER_ONE_WON)
-                || state.equals(RoomState.PLAYER_TWO_WON)
-                || state.equals(RoomState.DRAW);
-    }
 }

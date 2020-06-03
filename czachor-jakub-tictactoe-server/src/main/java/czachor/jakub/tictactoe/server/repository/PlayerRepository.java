@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class PlayerRepository {
@@ -16,6 +17,8 @@ public class PlayerRepository {
     }
 
     public Optional<Player> getByName(String name) {
+        System.out.println(name);
+        System.out.println(this.players);
         return this.players.stream().filter(p -> p.getName().equals(name)).findFirst();
     }
 

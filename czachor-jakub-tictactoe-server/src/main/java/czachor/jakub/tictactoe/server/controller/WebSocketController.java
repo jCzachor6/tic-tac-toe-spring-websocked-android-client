@@ -1,9 +1,10 @@
 package czachor.jakub.tictactoe.server.controller;
 
+import czachor.jakub.tictactoe.server.message.Action;
 import czachor.jakub.tictactoe.server.message.GameMessage;
+import czachor.jakub.tictactoe.server.message.MessageType;
 import czachor.jakub.tictactoe.server.models.Player;
 import czachor.jakub.tictactoe.server.models.Room;
-import czachor.jakub.tictactoe.server.models.dto.PlayerDto;
 import czachor.jakub.tictactoe.server.models.dto.RoomDto;
 import czachor.jakub.tictactoe.server.service.PlayerService;
 import czachor.jakub.tictactoe.server.service.RoomService;
@@ -36,39 +37,38 @@ public class WebSocketController {
 
     @MessageMapping("/tictactoe")
     private void game(GameMessage message) {
+        Player player = this.playerService.getPlayerByName(message.getPlayerName());
+        RoomDto roomDto = new RoomDto();
+        if(message.getRoomId() != null){
+            Room room = roomService.getById(message.getRoomId());
+            room.setCurrentAction(Action.builder()
+                    .player(player)
+                    .type(message.getType())
+                    .build()
+            );
+            if (message.getType().equals(MessageType.ACTION)) {
+                room.setTile(player, message.getTileIndex());
+            }
+            room.tick();
+            roomDto = Mapper.map(room);
+        }
         logger.info("Received message: {}", message);
         switch (message.getType()) {
-            case TIMEOUT_CHECK:
-                this.playerService.refreshTimeoutCheck(message.getPlayerName());
-                break;
             case ALL:
+            case LEAVE:
                 this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
                 break;
             case CONNECT:
-                PlayerDto playerDto = Mapper.map(this.playerService.getPlayerByName(message.getPlayerName()));
-                this.simpMessagingTemplate.convertAndSend("/player/" + message.getPlayerName(), playerDto);
+                this.simpMessagingTemplate.convertAndSend("/player/" + message.getPlayerName(), Mapper.map(player));
                 break;
             case JOIN:
-                Player player = playerService.getPlayerByName(message.getPlayerName());
-                RoomDto joinDto = Mapper.map(this.roomService.joinRoom(player, message.getRoomId()));
                 this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
-                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + joinDto.getId(), joinDto);
+                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + roomDto.getId(), roomDto);
                 break;
             case ACTION:
-                RoomDto actionDto = Mapper.map(this.roomService.setTile(message.getPlayerName(), message.getTileIndex().intValue(), message.getRoomId()));
-                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + actionDto.getId(), actionDto);
-                break;
             case REMATCH:
-                RoomDto rematchDto = Mapper.map(this.roomService.rematch(message.getPlayerName(), message.getRoomId()));
-                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + rematchDto.getId(), rematchDto);
-                break;
             case REFRESH:
-                RoomDto refreshDto = Mapper.map(this.roomService.getById(message.getRoomId()));
-                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + refreshDto.getId(), refreshDto);
-                break;
-            case LEAVE:
-                this.roomService.leaveRoom(message.getPlayerName());
-                this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
+                this.simpMessagingTemplate.convertAndSend("/tictactoe/" + roomDto.getId(), roomDto);
                 break;
         }
     }
@@ -84,7 +84,11 @@ public class WebSocketController {
                 activePlayers++;
                 long ms = (current.getTime() - room.getPlayerOne().getTimeoutCheck().getTime());
                 if (ms > 10000) {
-                    this.roomService.leaveRoom(room.getPlayerOne().getName());
+                    room.setCurrentAction(Action.builder()
+                            .player(room.getPlayerOne())
+                            .type(MessageType.LEAVE)
+                            .build());
+                    room.tick();
                     droppedCount++;
                 }
             }
@@ -92,7 +96,11 @@ public class WebSocketController {
                 activePlayers++;
                 long ms = (room.getPlayerTwo().getTimeoutCheck().getSeconds() - current.getSeconds());
                 if (ms > 10) {
-                    this.roomService.leaveRoom(room.getPlayerTwo().getName());
+                    room.setCurrentAction(Action.builder()
+                            .player(room.getPlayerTwo())
+                            .type(MessageType.LEAVE)
+                            .build());
+                    room.tick();
                     droppedCount++;
                 }
             }

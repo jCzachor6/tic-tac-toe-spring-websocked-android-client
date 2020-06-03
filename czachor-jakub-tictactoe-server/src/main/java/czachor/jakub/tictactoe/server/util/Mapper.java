@@ -26,7 +26,7 @@ public class Mapper {
             dto.setPlayerTwoGames(p2.getGames());
             dto.setPlayerTwoWins(p2.getWins());
         }
-        dto.setState(room.getState());
+        dto.setState(room.state());
         return dto;
     }
 
@@ -41,7 +41,7 @@ public class Mapper {
         if (p2 != null) {
             dto.setPlayerTwoName(p2.getName());
         }
-        dto.setState(room.getState());
+        dto.setState(room.state());
         return dto;
     }
 

@@ -43,6 +43,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>enum-finite-state-machine</groupId>
+            <artifactId>enum-finite-state-machine</artifactId>
+            <version>0.3.0</version>
+        </dependency>
     </dependencies>
 
 

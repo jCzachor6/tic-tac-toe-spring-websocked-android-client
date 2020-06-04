@@ -12,14 +12,8 @@ import java.util.stream.Collectors;
 public class PlayerRepository {
     private List<Player> players = new ArrayList<>();
 
-    public List<Player> getAll() {
-        return this.players;
-    }
-
     public Optional<Player> getByName(String name) {
-        System.out.println(name);
-        System.out.println(this.players);
-        return this.players.stream().filter(p -> p.getName().equals(name)).findFirst();
+        return this.players.stream().filter(p -> name.equals(p.getName())).findFirst();
     }
 
     public Player addPlayer(String name) {

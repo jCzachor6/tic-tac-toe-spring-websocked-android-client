@@ -94,7 +94,7 @@ public class GameFragment extends Fragment {
     }
 
     private void refreshRoom() {
-        GameMessage msg = GameMessage.getRefreshRoomMessage(currentRoom.getId());
+        GameMessage msg = GameMessage.getRefreshRoomMessage(currentRoom.getId(), playerName);
         TicTacToeApplication
                 .instance()
                 .getStompClient()

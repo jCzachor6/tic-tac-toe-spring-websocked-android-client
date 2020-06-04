@@ -2,6 +2,7 @@ package czachor.jakub.tictactoe.server.models;
 
 import czachor.jakub.statemachine.StateMachine;
 import czachor.jakub.tictactoe.server.message.Action;
+import czachor.jakub.tictactoe.server.message.MessageType;
 import czachor.jakub.tictactoe.server.util.RoomTransactions;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +40,7 @@ public class Room extends StateMachine<RoomState> {
     }
 
     public Boolean checkDraw() {
+        System.out.println(tiles);
         return tiles.stream().noneMatch(tile -> tile.equals("n"));
     }
 
@@ -56,12 +58,25 @@ public class Room extends StateMachine<RoomState> {
                 || checkLine(2, 4, 6, state);
     }
 
+    public boolean is(MessageType messageType) {
+        return messageType.equals(this.currentAction.getType());
+    }
+
+    public boolean currentPlayerOne() {
+        return playerOne.equals(currentAction.getPlayer());
+    }
+
+    public boolean currentPlayerTwo() {
+        return !currentPlayerOne();
+    }
+
     private Boolean checkLine(int tile1, int tile2, int tile3, String state) {
         return tiles.get(tile1).equals(state) && tiles.get(tile2).equals(state) && tiles.get(tile3).equals(state);
     }
 
-    public void setTile(Player player, int tileIndex) {
-        boolean isPlayerOne = playerOne.equals(player);
+    public void setTile() {
+        boolean isPlayerOne = playerOne.equals(getCurrentAction().getPlayer());
+        int tileIndex = currentAction.getTileIndex();
         if (isPlayerOne && state().equals(RoomState.PLAYER_ONE_TURN) && tiles.get(tileIndex).equals("n")) {
             setTile(tileIndex, true);
         } else if (!isPlayerOne && state().equals(RoomState.PLAYER_TWO_TURN) && tiles.get(tileIndex).equals("n")) {
@@ -80,6 +95,7 @@ public class Room extends StateMachine<RoomState> {
                 } else {
                     newTiles.add("o");
                 }
+                currentAction.setTileSet(true);
             }
         }
         tiles = newTiles;

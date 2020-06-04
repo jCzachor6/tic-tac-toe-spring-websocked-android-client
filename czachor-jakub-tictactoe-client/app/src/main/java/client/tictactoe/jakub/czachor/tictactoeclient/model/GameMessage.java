@@ -86,9 +86,10 @@ public class GameMessage {
         return message;
     }
 
-    public static GameMessage getRefreshRoomMessage(Long roomId) {
+    public static GameMessage getRefreshRoomMessage(Long roomId, String playerName) {
         GameMessage message = new GameMessage();
         message.roomId = roomId;
+        message.playerName = playerName;
         message.setType(MessageType.REFRESH);
         return message;
     }

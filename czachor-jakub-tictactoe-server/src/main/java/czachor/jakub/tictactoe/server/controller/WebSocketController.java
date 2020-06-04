@@ -37,22 +37,24 @@ public class WebSocketController {
 
     @MessageMapping("/tictactoe")
     private void game(GameMessage message) {
+        logger.info("Received message: {}", message);
         Player player = this.playerService.getPlayerByName(message.getPlayerName());
         RoomDto roomDto = new RoomDto();
-        if(message.getRoomId() != null){
+        if (message.getRoomId() != null) {
             Room room = roomService.getById(message.getRoomId());
             room.setCurrentAction(Action.builder()
                     .player(player)
                     .type(message.getType())
+                    .tileIndex(message.getTileIndex())
                     .build()
             );
             if (message.getType().equals(MessageType.ACTION)) {
-                room.setTile(player, message.getTileIndex());
+                room.setTile();
             }
+            System.out.println(room.availableTransitions());
             room.tick();
             roomDto = Mapper.map(room);
         }
-        logger.info("Received message: {}", message);
         switch (message.getType()) {
             case ALL:
             case LEAVE:
@@ -73,9 +75,9 @@ public class WebSocketController {
         }
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 100000000)
     public void dropOnTimeout() {
-        logger.info("Timeout check. ");
+        //logger.info("Timeout check. ");
         Date current = new Date();
         int droppedCount = 0;
         int activePlayers = 0;

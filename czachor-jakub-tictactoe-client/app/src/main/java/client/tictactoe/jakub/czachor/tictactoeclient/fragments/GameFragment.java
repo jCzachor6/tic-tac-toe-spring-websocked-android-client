@@ -5,16 +5,17 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
 
@@ -45,6 +46,8 @@ public class GameFragment extends Fragment {
 
     private List<ImageView> tiles = new ArrayList<>(9);
     private Boolean tilesInitialized = false;
+
+    private boolean ignoreOnDestroy = false;
 
     public GameFragment() {
     }
@@ -167,6 +170,7 @@ public class GameFragment extends Fragment {
                 break;
             case PLAYER_TWO_REMATCH:
                 this.roomMessage.setText(R.string.msg_player_two_rematch);
+                break;
             case DRAW:
                 this.roomMessage.setText(R.string.draw);
                 break;
@@ -194,8 +198,9 @@ public class GameFragment extends Fragment {
 
     private View.OnClickListener onLeaveButtonClick = v -> {
         handler.removeCallbacks(timeoutCheck);
+        this.ignoreOnDestroy = true;
         TicTacToeApplication.instance().getSubscriptions().remove("/tictactoe/" + this.currentRoom.getId());
-        GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName);
+        GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName, this.currentRoom.getId());
         TicTacToeApplication
                 .instance()
                 .getStompClient()
@@ -252,11 +257,13 @@ public class GameFragment extends Fragment {
     @Override
     public void onDestroy() {
         handler.removeCallbacks(timeoutCheck);
-        GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName);
-        TicTacToeApplication
-                .instance()
-                .getStompClient()
-                .send("/topic/tictactoe", msg.json()).subscribe();
+        if (!ignoreOnDestroy) {
+            GameMessage msg = GameMessage.getLeaveRoomMessage(this.playerName, this.currentRoom.getId());
+            TicTacToeApplication
+                    .instance()
+                    .getStompClient()
+                    .send("/topic/tictactoe", msg.json()).subscribe();
+        }
         super.onDestroy();
     }
 }

@@ -72,12 +72,14 @@ public class RoomTransactions {
                 () -> {
                     rematch.transition();
                     r.setWhoStarted("o");
-                });        r.setTransition(RoomState.PLAYER_TWO_REMATCH, RoomState.PLAYER_TWO_TURN,
+                });
+        r.setTransition(RoomState.PLAYER_TWO_REMATCH, RoomState.PLAYER_TWO_TURN,
                 () -> r.currentPlayerOne() && r.getWhoStarted().equals("o") && r.is(MessageType.REMATCH),
                 () -> {
                     rematch.transition();
                     r.setWhoStarted("x");
-                });        r.setTransition(RoomState.PLAYER_TWO_REMATCH, RoomState.PLAYER_ONE_TURN,
+                });
+        r.setTransition(RoomState.PLAYER_TWO_REMATCH, RoomState.PLAYER_ONE_TURN,
                 () -> r.currentPlayerOne() && r.getWhoStarted().equals("x") && r.is(MessageType.REMATCH),
                 () -> {
                     rematch.transition();
@@ -86,35 +88,25 @@ public class RoomTransactions {
     }
 
     private static void statesOnLeaveRoom(Room r) throws Exception {
-        List<RoomState> gameEndedStates = Arrays.asList(
-                RoomState.PLAYER_ONE_WON,
-                RoomState.PLAYER_TWO_WON,
-                RoomState.PLAYER_ONE_REMATCH,
-                RoomState.PLAYER_TWO_REMATCH,
-                RoomState.DRAW);
-        r.setTransition(gameEndedStates, RoomState.PLAYER_TWO,
+        r.setTransition(RoomState.gameEndedStates(), RoomState.PLAYER_TWO,
                 () -> r.currentPlayerOne() && r.is(MessageType.LEAVE),
                 () -> r.setPlayerOne(null));
-        r.setTransition(gameEndedStates, RoomState.PLAYER_ONE,
+        r.setTransition(RoomState.gameEndedStates(), RoomState.PLAYER_ONE,
                 () -> r.currentPlayerTwo() && r.is(MessageType.LEAVE),
                 () -> r.setPlayerTwo(null));
-
-        List<RoomState> onePlayer = Arrays.asList(
-                RoomState.PLAYER_ONE,
-                RoomState.PLAYER_TWO);
-        r.setTransition(onePlayer, RoomState.EMPTY,
+        r.setTransition(RoomState.onePlayerInRoom(), RoomState.EMPTY,
                 () -> r.is(MessageType.LEAVE),
                 () -> {
                     r.setPlayerOne(null);
                     r.setPlayerTwo(null);
                 });
-        r.setTransition(RoomState.PLAYER_ONE_TURN, RoomState.PLAYER_TWO,
+        r.setTransition(RoomState.anyPlayerTurn(), RoomState.PLAYER_TWO,
                 () -> r.currentPlayerOne() && r.is(MessageType.LEAVE),
                 () -> {
                     r.setPlayerOne(null);
                     r.getPlayerTwo().addWin();
                 });
-        r.setTransition(RoomState.PLAYER_TWO_TURN, RoomState.PLAYER_TWO,
+        r.setTransition(RoomState.anyPlayerTurn(), RoomState.PLAYER_ONE,
                 () -> r.currentPlayerTwo() && r.is(MessageType.LEAVE),
                 () -> {
                     r.setPlayerTwo(null);
@@ -123,12 +115,7 @@ public class RoomTransactions {
     }
 
     private static void statesAfterSetTile(Room r) throws Exception {
-        List<RoomState> onePlayer = Arrays.asList(
-                RoomState.PLAYER_ONE,
-                RoomState.PLAYER_TWO);
-        r.setTransition(onePlayer, RoomState.DRAW,
-                r::checkDraw,
-                Event.none);
+        r.setTransition(RoomState.anyPlayerTurn(), RoomState.DRAW, r::checkDraw, Event.none);
         r.setTransition(RoomState.PLAYER_ONE_TURN, RoomState.PLAYER_ONE_WON,
                 () -> r.checkTiles("x") && r.is(MessageType.ACTION),
                 () -> r.getPlayerOne().addWin());
@@ -137,11 +124,9 @@ public class RoomTransactions {
                 () -> r.getPlayerTwo().addWin());
         r.setTransition(RoomState.PLAYER_ONE_TURN, RoomState.PLAYER_TWO_TURN,
                 () -> !r.checkTiles("x") && !r.checkTiles("o") && r.getCurrentAction().isTileSet() && r.is(MessageType.ACTION),
-                () -> {
-                });
+                Event.none);
         r.setTransition(RoomState.PLAYER_TWO_TURN, RoomState.PLAYER_ONE_TURN,
                 () -> !r.checkTiles("x") && !r.checkTiles("o") && r.getCurrentAction().isTileSet() && r.is(MessageType.ACTION),
-                () -> {
-                });
+                Event.none);
     }
 }

@@ -58,14 +58,12 @@ public class WebSocketController {
         switch (message.getType()) {
             case ALL:
             case LEAVE:
-                this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
-                break;
-            case CONNECT:
-                this.simpMessagingTemplate.convertAndSend("/player/" + message.getPlayerName(), Mapper.map(player));
-                break;
             case JOIN:
                 this.simpMessagingTemplate.convertAndSend("/rooms/", this.roomsLookup());
                 this.simpMessagingTemplate.convertAndSend("/tictactoe/" + roomDto.getId(), roomDto);
+                break;
+            case CONNECT:
+                this.simpMessagingTemplate.convertAndSend("/player/" + message.getPlayerName(), Mapper.map(player));
                 break;
             case ACTION:
             case REMATCH:
@@ -75,9 +73,9 @@ public class WebSocketController {
         }
     }
 
-    @Scheduled(fixedRate = 100000000)
+    @Scheduled(fixedRate = 10000)
     public void dropOnTimeout() {
-        //logger.info("Timeout check. ");
+        logger.info("Timeout check. ");
         Date current = new Date();
         int droppedCount = 0;
         int activePlayers = 0;

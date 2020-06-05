@@ -79,9 +79,10 @@ public class GameMessage {
         return message;
     }
 
-    public static GameMessage getLeaveRoomMessage(String playerName) {
+    public static GameMessage getLeaveRoomMessage(String playerName, Long roomId) {
         GameMessage message = new GameMessage();
         message.playerName = playerName;
+        message.roomId = roomId;
         message.setType(MessageType.LEAVE);
         return message;
     }

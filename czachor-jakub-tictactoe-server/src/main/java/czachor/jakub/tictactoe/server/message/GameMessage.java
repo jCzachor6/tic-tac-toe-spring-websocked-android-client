@@ -11,5 +11,5 @@ public class GameMessage {
     private MessageType type;
     private String playerName;
     private Long roomId;
-    private Long tileIndex;
+    private int tileIndex;
 }

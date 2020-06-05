@@ -17,6 +17,7 @@ public class Player {
         this.games = 0L;
         this.wins = 0L;
         this.rematch = false;
+        this.timeoutCheck = new Date();
     }
 
     public void addWin() {

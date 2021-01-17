@@ -3,50 +3,36 @@ package client.tictactoe.jakub.czachor.tictactoeclient.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.List;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
 import client.tictactoe.jakub.czachor.tictactoeclient.TicTacToeApplication;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.GameMessage;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.Room;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.RoomState;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameListMessage;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameRoomDto;
 import client.tictactoe.jakub.czachor.tictactoeclient.utils.RecyclerViewAdapter;
+import io.socket.client.IO;
+import io.socket.emitter.Emitter;
 
 public class RoomsFragment extends Fragment implements RecyclerViewAdapter.ItemClickListener {
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
-    private Button refreshButton;
-
-    private String playerName;
-
-    public static RoomsFragment newInstance(String playerName) {
-        RoomsFragment f = new RoomsFragment();
-        Bundle args = new Bundle();
-        args.putString("playerName", playerName);
-        f.setArguments(args);
-        return f;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.loadArgs();
         this.subscribe();
     }
 
@@ -62,57 +48,51 @@ public class RoomsFragment extends Fragment implements RecyclerViewAdapter.ItemC
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(Objects.requireNonNull(getActivity()).getApplicationContext())
         );
-        refreshButton = view.findViewById(R.id.refresh_button);
-        refreshButton.setOnClickListener(b -> loadRooms());
-        this.loadRooms();
+        recyclerViewAdapter = new RecyclerViewAdapter(getActivity().getApplicationContext());
+        recyclerViewAdapter.setClickListener(this);
+        recyclerView.setAdapter(recyclerViewAdapter);
         return view;
     }
 
     @SuppressLint("CheckResult")
     private void subscribe() {
-        TicTacToeApplication.instance().getSubscriptions().addSubscription("/rooms/", topicMessage -> {
-            List<Room> roomList = new Gson().fromJson(topicMessage.getPayload(), new TypeToken<List<Room>>() {
-            }.getType());
-            Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-                recyclerViewAdapter = new RecyclerViewAdapter(getActivity().getApplicationContext(), roomList);
-                recyclerViewAdapter.setClickListener(this);
-                recyclerView.setAdapter(recyclerViewAdapter);
-            });
-        });
-    }
-
-    void loadArgs() {
-        Bundle args = getArguments();
-        if (args != null) {
-            this.playerName = args.getString("playerName");
+        String jwt = TicTacToeApplication.instance().getAuth().getJwt();
+        try {
+            IO.Options options = new IO.Options();
+            options.forceNew = true;
+            TicTacToeApplication.instance().gameListSocket =
+                    IO.socket("http://10.0.2.2:9092/ttt/room-list?token=" + jwt, options);
+            TicTacToeApplication.instance().gameListSocket.on("room-list", roomChangesListener());
+            TicTacToeApplication.instance().gameListSocket.connect();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
-    }
-
-    private void loadRooms() {
-        GameMessage msg = GameMessage.getRoomsMessage(this.playerName);
-        TicTacToeApplication
-                .instance()
-                .getStompClient()
-                .send("/topic/tictactoe", msg.json()).subscribe();
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        Room room = recyclerViewAdapter.getItem(position);
-        if (RoomState.isFull(room.getState())) {
+        GameRoomDto room = recyclerViewAdapter.getItem(position);
+        if (room.getPlayerOneName() != null && room.getPlayerTwoName() != null) {
             Toast.makeText(view.getContext(), R.string.room_full, Toast.LENGTH_SHORT).show();
         } else {
-            this.startGameFragment(room, this.playerName);
+            this.startGameFragment(room);
         }
     }
 
-    private void startGameFragment(Room room, String playerName) {
-        GameMessage msg = GameMessage.getJoinGameMessage(this.playerName, room.getId());
-        TicTacToeApplication
-                .instance()
-                .getStompClient()
-                .send("/topic/tictactoe", msg.json()).subscribe();
-        GameFragment gameFragment = GameFragment.newInstance(room, playerName);
+    private Emitter.Listener roomChangesListener() {
+        return args -> {
+            for (Object arg : args) { //weird bugfix
+                if (arg.toString().startsWith("{")) {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+                        recyclerViewAdapter.updateData(GameListMessage.parse(arg.toString()));
+                    });
+                }
+            }
+        };
+    }
+
+    private void startGameFragment(GameRoomDto room) {
+        GameFragment gameFragment = GameFragment.newInstance(room);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, gameFragment).commit();

@@ -1,47 +1,51 @@
 package client.tictactoe.jakub.czachor.tictactoeclient.fragments;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.fragment.app.Fragment;
+
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
+import client.tictactoe.jakub.czachor.tictactoeclient.TicTacToeApplication;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameUser;
+import client.tictactoe.jakub.czachor.tictactoeclient.utils.AuthService;
+import retrofit2.Callback;
 
 public class ConnectFragment extends Fragment {
-    private Button enterNameButton;
-    private ConnectionListener callback;
-    private EditText editText;
+    private AuthService authService = TicTacToeApplication.instance().getAuthService();
+    private EditText usernameEditText;
+    private EditText passwordEditText;
+    private Callback<GameUser> authSuccessCallback;
 
-    public ConnectFragment() {
+    public ConnectFragment(Callback<GameUser> authSuccessCallback) {
+        this.authSuccessCallback = authSuccessCallback;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
-        this.editText = view.findViewById(R.id.enter_name_et);
-        this.initButton(view);
+        this.usernameEditText = view.findViewById(R.id.username_et);
+        this.passwordEditText = view.findViewById(R.id.password_et);
+        view.findViewById(R.id.login_btn).setOnClickListener(
+                v -> authService.login(buildRequestBody()).enqueue(authSuccessCallback)
+        );
+        view.findViewById(R.id.register_btn).setOnClickListener(
+                v -> authService.register(buildRequestBody()).enqueue(authSuccessCallback)
+        );
+        view.findViewById(R.id.anonymous_btn).setOnClickListener(
+                v -> authService.anonymous().enqueue(authSuccessCallback)
+        );
         return view;
     }
 
-    public interface ConnectionListener {
-        void onConnectButtonClicked(String playerName);
-    }
-
-    public void setCallback(ConnectionListener callback) {
-        this.callback = callback;
-    }
-
-    private void initButton(View view) {
-        this.enterNameButton = view.findViewById(R.id.enter_name_button);
-        this.enterNameButton.setOnClickListener(v -> {
-            String playerName = editText.getText().toString();
-            if (playerName.length() > 0) {
-                callback.onConnectButtonClicked(playerName);
-            }
-        });
+    private GameUser buildRequestBody() {
+        GameUser req = new GameUser();
+        req.setUsername(usernameEditText.getText().toString());
+        req.setPassword(passwordEditText.getText().toString());
+        return req;
     }
 }

@@ -9,22 +9,17 @@ import client.tictactoe.jakub.czachor.tictactoeclient.fragments.AccountFragment;
 import client.tictactoe.jakub.czachor.tictactoeclient.fragments.RoomsFragment;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
-    private String playerName;
-
-    public ViewPagerAdapter(FragmentManager fm, String playerName) {
+    public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.playerName = playerName;
     }
 
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return AccountFragment.newInstance(this.playerName);
-            case 1:
-                return RoomsFragment.newInstance(this.playerName);
+        if (position == 0) {
+            return new RoomsFragment();
+        } else {
+            return new AccountFragment();
         }
-        return null;
     }
 
     @Override
@@ -35,13 +30,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position) {
-            case 0:
-                return "Profile";
-            case 1:
-                return "Tic-tac-toe";
-            default:
-                return "";
+        if (position == 0) {
+            return "Tic-tac-toe";
+        } else {
+            return "Profile";
         }
     }
 }

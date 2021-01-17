@@ -1,29 +1,34 @@
 package client.tictactoe.jakub.czachor.tictactoeclient.utils;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import client.tictactoe.jakub.czachor.tictactoeclient.R;
-import client.tictactoe.jakub.czachor.tictactoeclient.model.Room;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameListMessage;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameRoomDto;
 
 /**
  * @author jakub
  * Created on 12.05.2019.
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private List<Room> data;
+    private List<GameRoomDto> rooms;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
 
-    public RecyclerViewAdapter(Context context, List<Room> data) {
+    public RecyclerViewAdapter(Context context) {
         this.inflater = LayoutInflater.from(context);
-        this.data = data;
+        this.rooms = new ArrayList<>();
     }
 
     @Override
@@ -34,17 +39,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String playerOne = data.get(position).getPlayerOneName();
+        String playerOne = rooms.get(position).getPlayerOneName();
         holder.playerOne.setText(StringUtils.defaultString(playerOne, "-empty-"));
-        String playerTwo = data.get(position).getPlayerTwoName();
+        String playerTwo = rooms.get(position).getPlayerTwoName();
         holder.playerTwo.setText(StringUtils.defaultString(playerTwo, "-empty-"));
-        String roomId = "Room " + data.get(position).getId() + ": ";
+        String roomId = "Room " + rooms.get(position).getId() + ": ";
         holder.roomId.setText(roomId);
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return rooms.size();
     }
 
 
@@ -69,12 +74,33 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    public Room getItem(int id) {
-        return data.get(id);
+    public GameRoomDto getItem(int id) {
+        return rooms.get(id);
     }
 
     public void setClickListener(ItemClickListener itemClickListener) {
         this.clickListener = itemClickListener;
+    }
+
+    public void updateData(GameListMessage data) {
+        String state = data.getState();
+        List<GameRoomDto> rooms = data.getRooms();
+        if (state.equals("ALL")) {
+            this.rooms = rooms;
+            notifyDataSetChanged();
+        } else if (state.equals("UPDATED")) {
+            for (int i = 0; i < rooms.size(); i++) {
+                for (int j = 0; j < this.rooms.size(); j++) {
+                    GameRoomDto newer = rooms.get(i);
+                    GameRoomDto original = this.rooms.get(j);
+                    if (rooms.get(i).getId().equals(original.getId())) {
+                        original.setPlayerOneName(newer.getPlayerOneName());
+                        original.setPlayerTwoName(newer.getPlayerTwoName());
+                        notifyItemChanged(j);
+                    }
+                }
+            }
+        }
     }
 
     public interface ItemClickListener {

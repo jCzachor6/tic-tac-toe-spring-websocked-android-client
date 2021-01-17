@@ -2,107 +2,83 @@ package client.tictactoe.jakub.czachor.tictactoeclient.model;
 
 import com.google.gson.Gson;
 
+import java.util.List;
+
 public class GameMessage {
-    private MessageType type;
-    private String playerName;
-    private Long roomId;
-    private Long tileIndex;
+    private List<Character> tiles;
+    private String gameState;
+    private GameRoomDto room;
+    private String playerRematch;
+    private String playerWon;
+    private boolean draw;
+    private String playerTurn;
+    private boolean playerLeft;
 
-    public MessageType getType() {
-        return type;
+    public static GameMessage parse(String json) {
+        return new Gson().fromJson(json, GameMessage.class);
     }
 
-    public void setType(MessageType type) {
-        this.type = type;
+    public List<Character> getTiles() {
+        return tiles;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public void setTiles(List<Character> tiles) {
+        this.tiles = tiles;
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+    public String getGameState() {
+        return gameState;
     }
 
-    public Long getRoomId() {
-        return roomId;
+    public void setGameState(String gameState) {
+        this.gameState = gameState;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public String getPlayerRematch() {
+        return playerRematch;
     }
 
-    public Long getTileIndex() {
-        return tileIndex;
+    public void setPlayerRematch(String playerRematch) {
+        this.playerRematch = playerRematch;
     }
 
-    public void setTileIndex(Long tileIndex) {
-        this.tileIndex = tileIndex;
+    public String getPlayerWon() {
+        return playerWon;
     }
 
-    public static GameMessage getRoomsMessage(String playerName) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.setType(MessageType.ALL);
-        return message;
+    public void setPlayerWon(String playerWon) {
+        this.playerWon = playerWon;
     }
 
-    public static GameMessage getConnectMessage(String playerName) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.setType(MessageType.CONNECT);
-        return message;
+    public String getPlayerTurn() {
+        return playerTurn;
     }
 
-    public static GameMessage getJoinGameMessage(String playerName, Long roomId) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.roomId = roomId;
-        message.setType(MessageType.JOIN);
-        return message;
+    public void setPlayerTurn(String playerTurn) {
+        this.playerTurn = playerTurn;
     }
 
-    public static GameMessage getActionMessage(String playerName, Long tileIndex, Long roomId) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.roomId = roomId;
-        message.setType(MessageType.ACTION);
-        message.setTileIndex(tileIndex);
-        return message;
+    public boolean isPlayerLeft() {
+        return playerLeft;
     }
 
-    public static GameMessage getRematchMessage(String playerName, Long roomId) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.roomId = roomId;
-        message.setType(MessageType.REMATCH);
-        return message;
+    public void setPlayerLeft(boolean playerLeft) {
+        this.playerLeft = playerLeft;
     }
 
-    public static GameMessage getLeaveRoomMessage(String playerName, Long roomId) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.roomId = roomId;
-        message.setType(MessageType.LEAVE);
-        return message;
+    public GameRoomDto getRoom() {
+        return room;
     }
 
-    public static GameMessage getRefreshRoomMessage(Long roomId, String playerName) {
-        GameMessage message = new GameMessage();
-        message.roomId = roomId;
-        message.playerName = playerName;
-        message.setType(MessageType.REFRESH);
-        return message;
+    public void setRoom(GameRoomDto room) {
+        this.room = room;
     }
 
-    public static GameMessage getTimeoutCheckMessage(String playerName) {
-        GameMessage message = new GameMessage();
-        message.playerName = playerName;
-        message.setType(MessageType.TIMEOUT_CHECK);
-        return message;
+    public boolean isDraw() {
+        return draw;
     }
 
-    public String json() {
-        return new Gson().toJson(this);
+    public void setDraw(boolean draw) {
+        this.draw = draw;
     }
 }

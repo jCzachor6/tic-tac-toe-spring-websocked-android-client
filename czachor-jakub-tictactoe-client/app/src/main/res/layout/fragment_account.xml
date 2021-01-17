@@ -24,30 +24,6 @@
             android:textAlignment="center"
             android:textSize="45sp" />
 
-        <TextView
-            android:id="@+id/account_player_wins"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/wins"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/account_player_games"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/games"
-            android:textAlignment="center" />
-
-        <ImageButton
-            android:id="@+id/account_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="#00FFFFFF"
-            android:contentDescription="@string/refresh_profile"
-            android:src="@drawable/ic_refresh_icon" />
-
-
     </LinearLayout>
 
     <Button

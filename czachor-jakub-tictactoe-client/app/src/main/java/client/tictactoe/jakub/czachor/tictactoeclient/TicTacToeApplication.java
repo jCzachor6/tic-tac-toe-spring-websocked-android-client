@@ -2,9 +2,11 @@ package client.tictactoe.jakub.czachor.tictactoeclient;
 
 import android.app.Application;
 
-import client.tictactoe.jakub.czachor.tictactoeclient.utils.Subscriptions;
-import ua.naiksoftware.stomp.Stomp;
-import ua.naiksoftware.stomp.StompClient;
+import client.tictactoe.jakub.czachor.tictactoeclient.model.GameUser;
+import client.tictactoe.jakub.czachor.tictactoeclient.utils.AuthService;
+import io.socket.client.Socket;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -13,35 +15,54 @@ import ua.naiksoftware.stomp.StompClient;
  */
 public class TicTacToeApplication extends Application {
     private static TicTacToeApplication application;
-    private StompClient stompClient;
-    private Subscriptions subscriptions;
+    private GameUser auth;
+    private AuthService authService;
+    public Socket gameListSocket;
+    public Socket gameRoomSocket;
 
     @Override
     public void onCreate() {
         super.onCreate();
         application = this;
+        this.initRetrofit();
     }
 
-    public void initWebsocket() {
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws/websocket");
-        stompClient.connect();
-        subscriptions = new Subscriptions();
-    }
-
-    public void closeConnection() {
-        this.subscriptions.removeAll();
-        this.stompClient.disconnect();
-    }
-
-    public StompClient getStompClient() {
-        return stompClient;
-    }
-
-    public Subscriptions getSubscriptions() {
-        return subscriptions;
+    private void initRetrofit() {
+        Retrofit retrofit = new Retrofit
+                .Builder()
+                .baseUrl("http://10.0.2.2:8080/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        authService = retrofit.create(AuthService.class);
     }
 
     public static TicTacToeApplication instance() {
         return application;
+    }
+
+    public AuthService getAuthService() {
+        return authService;
+    }
+
+    public GameUser getAuth() {
+        return auth;
+    }
+
+    public void setAuth(GameUser auth) {
+        this.auth = auth;
+    }
+
+    public void disconnect() {
+        setAuth(null);
+        if (gameListSocket != null) {
+            gameListSocket.off();
+            gameListSocket.disconnect();
+            gameListSocket = null;
+        }
+        if (gameRoomSocket != null) {
+            gameRoomSocket.off();
+            gameRoomSocket.disconnect();
+            gameRoomSocket = null;
+        }
     }
 }

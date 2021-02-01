@@ -1,15 +1,14 @@
 package czachor.jakub.tictactoe.server.impl.user;
 
-import generic.online.game.server.gogs.utils.AnonymousPrefixGenerator;
-import org.springframework.stereotype.Component;
+import generic.online.game.server.gogs.utils.AnonymousUsernameGenerator;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-@Component
-public class RandomAnimalUserPrefixGenerator implements AnonymousPrefixGenerator {
+public class RandomAnimalUserPrefixGenerator implements AnonymousUsernameGenerator {
+    private int id;
     private final Random random = new Random(new Date().getTime());
     private final List<String> animals = Arrays.asList(
             "Cow", "Rabbit", "Duck", "Shrimp", "Pig",
@@ -23,6 +22,6 @@ public class RandomAnimalUserPrefixGenerator implements AnonymousPrefixGenerator
 
     @Override
     public String generate() {
-        return animals.get(random.nextInt(animals.size())) + "#";
+        return animals.get(random.nextInt(animals.size())) + "#" + ++id;
     }
 }

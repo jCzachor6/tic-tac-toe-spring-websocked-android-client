@@ -8,11 +8,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "GAME_USERS")
 public class GameUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
     @Column(name = "USERNAME", nullable = false)
     private String username;
+
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 }

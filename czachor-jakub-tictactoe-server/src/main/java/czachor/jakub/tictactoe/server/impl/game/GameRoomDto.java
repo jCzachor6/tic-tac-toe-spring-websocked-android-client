@@ -1,6 +1,6 @@
 package czachor.jakub.tictactoe.server.impl.game;
 
-import generic.online.game.server.gogs.model.auth.User;
+import generic.online.game.server.gogs.api.auth.model.User;
 import lombok.Data;
 
 @Data

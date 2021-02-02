@@ -4,10 +4,11 @@ import czachor.jakub.statemachine.Event;
 import czachor.jakub.statemachine.StateMachine;
 import generic.online.game.server.gogs.api.auth.model.User;
 import generic.online.game.server.gogs.model.rooms.Room;
+import generic.online.game.server.gogs.model.rooms.RoomContext;
 import generic.online.game.server.gogs.model.rooms.RoomInitializerData;
-import generic.online.game.server.gogs.utils.annotations.OnConnect;
-import generic.online.game.server.gogs.utils.annotations.OnDisconnect;
-import generic.online.game.server.gogs.utils.annotations.OnMessage;
+import generic.online.game.server.gogs.utils.interfaces.OnConnect;
+import generic.online.game.server.gogs.utils.interfaces.OnDisconnect;
+import io.javalin.plugin.json.JavalinJson;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -16,7 +17,7 @@ import java.util.Arrays;
 import static czachor.jakub.tictactoe.server.impl.game.GameRoomState.*;
 
 @Getter
-public class GameRoom extends Room {
+public class GameRoom extends Room implements OnConnect, OnDisconnect {
     private StateMachine<GameRoomState> gameState;
     private Board board;
     private User playerX;
@@ -43,7 +44,12 @@ public class GameRoom extends Room {
                 .setTransition(FINISHED, TURN, () -> playerXasksForRematch && playerOasksForRematch, onGameStarted);
     }
 
-    @OnConnect
+    @Override
+    public void handlers(RoomContext ctx) {
+        ctx.onMessage("SET_TILE", this::processSetTileMessage);
+        ctx.onMessage("REMATCH", this::processRematchMessage);
+    }
+
     public void onConnect(User user) {
         if (playerX == null) {
             playerX = user;
@@ -55,7 +61,6 @@ public class GameRoom extends Room {
         gameState.tick();
     }
 
-    @OnDisconnect
     public void onDisconnect(User user) {
         if (user.equals(playerX)) {
             playerX = null;
@@ -67,8 +72,8 @@ public class GameRoom extends Room {
         gameState.tick();
     }
 
-    @OnMessage("SET_TILE")
-    public void processSetTileMessage(User user, InputMessage msg) {
+    private void processSetTileMessage(User user, String body) {
+        InputMessage msg = JavalinJson.fromJson(body, InputMessage.class);
         if (!board.isGameOver()) {
             if (user.getUsername().equals(playerTurn) && board.isTileEmpty(msg.getTileIndex())) {
                 this.setTile(user, msg.getTileIndex());
@@ -77,8 +82,7 @@ public class GameRoom extends Room {
         }
     }
 
-    @OnMessage("REMATCH")
-    public void processRematchMessage(User user, InputMessage msg) {
+    public void processRematchMessage(User user, String body) {
         if (board.isGameOver()) {
             if (user.getUsername().equals(playerX.getUsername()) && !playerXasksForRematch) {
                 playerXasksForRematch = true;
